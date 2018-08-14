@@ -1,9 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/pquerna/ffjson/ffjson"
 )
 
 type P struct {
@@ -18,8 +19,8 @@ func main() {
 
 	for i := 0; i < 500000; i++ {
 		p := &P{3, 4, "Pythagoras"}
-		str, _ := json.Marshal(p)
-		json.Unmarshal(str, &q)
+		str, _ := ffjson.Marshal(p)
+		ffjson.Unmarshal(str, &q)
 	}
 
 	fmt.Println(q)
