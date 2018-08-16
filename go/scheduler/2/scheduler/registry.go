@@ -1,4 +1,4 @@
-package task
+package scheduler
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 )
 
 type Function interface{}
+
+type Param interface{}
 
 type FunctionMeta struct {
 	Name     string
@@ -38,6 +40,7 @@ func (reg *FuncRegistry) Add(function Function) (FunctionMeta, error) {
 	reg.funcs[name] = FunctionMeta{
 		Name:     name,
 		function: function,
+		params:   reg.resolveParamTypes(function),
 	}
 	return reg.funcs[name], nil
 }
@@ -48,4 +51,32 @@ func (reg *FuncRegistry) Get(name string) (FunctionMeta, error) {
 		return function, nil
 	}
 	return FunctionMeta{}, fmt.Errorf("Function %s not found", name)
+}
+
+func (reg *FuncRegistry) Exists(name string) bool {
+	_, ok := reg.funcs[name]
+	if ok {
+		return true
+	}
+	return false
+}
+
+func (meta *FunctionMeta) Params() []reflect.Type {
+	funcType := reflect.TypeOf(meta.function)
+	paramTypes := make([]reflect.Type, funcType.NumIn())
+	for idx := 0; idx < funcType.NumIn(); idx++ {
+		in := funcType.In(idx)
+		paramTypes[idx] = in
+	}
+	return paramTypes
+}
+
+func (reg *FuncRegistry) resolveParamTypes(function Function) map[string]reflect.Type {
+	paramTypes := make(map[string]reflect.Type)
+	funcType := reflect.TypeOf(function)
+	for idx := 0; idx < funcType.NumIn(); idx++ {
+		in := funcType.In(idx)
+		paramTypes[in.Name()] = in
+	}
+	return paramTypes
 }
