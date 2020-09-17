@@ -1,0 +1,15 @@
+{
+  "name": "loadtest-tools",
+  "version": "1.0.0",
+  "description": "for loadtest tools",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dwiyan Rezkia Putra",
+  "license": "ISC",
+  "dependencies": {
+    "interval-promise": "^1.4.0",
+    "node-fetch": "^2.6.0"
+  }
+}
