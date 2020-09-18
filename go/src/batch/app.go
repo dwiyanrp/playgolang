@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,12 +13,13 @@ type Foo struct {
 }
 
 var (
+	done = make(chan os.Signal, 1)
+
 	batch     = make([]Foo, 0, 10)
 	batchChan = make(chan *Foo)
 )
 
 func main() {
-	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// case1()
@@ -27,9 +27,11 @@ func main() {
 	case3()
 
 	<-done
-	batchInsert(batch)
+	graceful()
+}
 
-	log.Print("Server Stopped")
+func graceful() {
+	batchInsert(batch)
 }
 
 func insertOne() {
@@ -72,7 +74,7 @@ func case2() {
 
 	go func() {
 		for i := 0; i < 100; i++ {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(222 * time.Millisecond)
 			batchChan <- &Foo{}
 		}
 	}()
@@ -102,6 +104,9 @@ func case3() {
 				if len(tempBatch) > 0 {
 					batchInsert(tempBatch)
 				}
+
+			case <-done:
+				batchInsert(batch)
 			}
 		}
 	}()
