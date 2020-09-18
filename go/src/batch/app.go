@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -15,10 +19,17 @@ var (
 )
 
 func main() {
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// case1()
 	// case2()
 	case3()
-	time.Sleep(10 * time.Second)
+
+	<-done
+	batchInsert(batch)
+
+	log.Print("Server Stopped")
 }
 
 func insertOne() {
