@@ -31,7 +31,7 @@ func main() {
 }
 
 func graceful() {
-	batchInsert(batch)
+	batchInsert(batch) // Make sure batch is empty & all data executed
 }
 
 func insertOne() {
